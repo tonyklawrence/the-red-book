@@ -1,25 +1,18 @@
 package evil.ducks.four
 
 sealed trait Option[+A] {
-  def map[B](f: A => B): Option[B]
-  def flatMap[B](f: A => Option[B]): Option[B]
-  def getOrElse[B >: A](default: => B): B
-  def orElse[B >: A](ob: => Option[B]): Option[B]
-  def filter(f: A => Boolean): Option[A]
+  def map[B](f: A => B): Option[B] = this match {
+    case None() => None()
+    case Some(a) => Some(f(a))
+  }
+  def getOrElse[B >: A](default: => B): B = this match {
+    case None() => default
+    case Some(a) => a
+  }
+  def flatMap[B](f: A => Option[B]): Option[B] = map(f) getOrElse None()
+  def orElse[B >: A](ob: => Option[B]): Option[B] = map (Some(_)) getOrElse ob
+  def filter(f: A => Boolean): Option[A] = flatMap (n => if (f(n)) Some(n) else None())
 }
 
-case class Some[+A](get: A) extends Option[A] {
-  override def map[B](f: (A) => B): Option[B] = ???
-  override def flatMap[B](f: (A) => Option[B]): Option[B] = ???
-  override def getOrElse[B >: A](default: => B): B = ???
-  override def orElse[B >: A](ob: => Option[B]): Option[B] = ???
-  override def filter(f: A => Boolean): Option[Nothing] = ???
-}
-
-case class None extends Option[Nothing] {
-  override def map[B](f: (Nothing) => B): Option[B] = ???
-  override def flatMap[B](f: (Nothing) => Option[B]): Option[B] = ???
-  override def getOrElse[B >: Nothing](default: => B): B = ???
-  override def orElse[B >: Nothing](ob: => Option[B]): Option[B] = ???
-  override def filter(f: Nothing => Boolean): Option[Nothing] = ???
-}
+case class Some[+A](get: A) extends Option[A]
+case class None() extends Option[Nothing]

@@ -16,3 +16,11 @@ sealed trait Option[+A] {
 
 case class Some[+A](get: A) extends Option[A]
 case class None() extends Option[Nothing]
+
+object Option {
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = a match {
+    case Nil => Some(Nil)
+    case (None() :: as) => None()
+    case (Some(a) :: as) => a :: sequence(as)
+  }
+}
